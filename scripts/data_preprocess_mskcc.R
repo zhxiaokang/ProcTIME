@@ -17,11 +17,8 @@ mskcc.gene.inter <- mskcc.gene[, id.inter]
 
 mskcc.clinical.inter <- mskcc.clinical[id.inter, ]
 
-# =========== preprocess the clinical data ===========
-# remove the patients without BCR info
-df.bcr.mskcc <- filter(mskcc.clinical.inter, !(BCR_Event == "NA"))
-
-# filter those people out from the gene expression matrix
-df.gene.mskcc <- mskcc.gene.inter[, rownames(df.bcr.mskcc)]
+# =========== save the data ===========
+df.bcr.mskcc <- mskcc.clinical.inter
+df.gene.mskcc <- mskcc.gene.inter
 
 save(df.bcr.mskcc, df.gene.mskcc, file = "../data/prad_data_mskcc.RData")

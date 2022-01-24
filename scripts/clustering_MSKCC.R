@@ -23,8 +23,8 @@ res.deconv.mskcc.scale.sample$class <- unname(results.mskcc[[3]][["consensusClas
 
 # Merge cluster 2 and 3
 cluster <- unname(results.mskcc[[3]][["consensusClass"]])
-cluster[which(cluster == "1" | cluster == "2")] <- "good"
-cluster[which(cluster == "3")] <- "bad"
+cluster[which(cluster == "2" | cluster == "3")] <- "good"
+cluster[which(cluster == "1")] <- "bad"
 
 res.deconv.mskcc.scale.sample$class <- cluster
 
