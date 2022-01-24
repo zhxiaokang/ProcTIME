@@ -19,7 +19,29 @@ results.mskcc <- ConsensusClusterPlus(as.matrix(res.deconv.mskcc.scale), maxK=6,
 
 res.deconv.mskcc.scale.sample <- as.data.frame(t(res.deconv.mskcc.scale))
 
-res.deconv.mskcc.scale.sample$class <- unname(results.mskcc[[3]][["consensusClass"]])
+# ===== draw KM plot of clusters =====
+cluster <- unname(results.mskcc[[3]][["consensusClass"]])
+
+res.deconv.mskcc.scale.sample$class <- cluster
+
+df.bcr.mskcc.class <- merge(res.deconv.mskcc.scale.sample, df.bcr.mskcc, by = "row.names")
+df.bcr.mskcc.class <- column_to_rownames(df.bcr.mskcc.class, colnames(df.bcr.mskcc.class)[1])
+
+df.bcr.mskcc.class$bcr_days <- as.numeric(df.bcr.mskcc.class$BCR_FreeTime)
+df.bcr.mskcc.class$biochemical_recurrence <- 1*(df.bcr.mskcc.class$BCR_Event=="BCR_Algorithm")
+
+df.surv <- dplyr::select(df.bcr.mskcc.class, c(bcr_days, biochemical_recurrence, class))
+
+df.surv <- na.omit(df.surv)
+
+options(repr.plot.width=6, repr.plot.height=5.5)
+
+km.fit <- survfit(Surv(bcr_days, biochemical_recurrence) ~ class, data=df.surv)
+p.surv <- ggsurvplot(km.fit, pval = TRUE, risk.table = TRUE, ncensor.plot = FALSE)
+
+pdf(file.path("../output/Consensus_clustering_epic_pam_pearson_average_mskcc", "surv_curv_3_groups.pdf"))
+print(p.surv)
+dev.off()
 
 # Merge cluster 2 and 3
 cluster <- unname(results.mskcc[[3]][["consensusClass"]])
