@@ -144,6 +144,17 @@ res.deconv.tcga <- res.deconv.tcga[, patients.keep]
 res.deconv.scale.tcga <- res.deconv.scale.tcga[, patients.keep]
 res.deconv.sample.tcga <- res.deconv.sample.tcga[patients.keep, ]
 
+km.fit <- survminer::surv_fit(Surv(bcr_months, biochemical_recurrence) ~ cluster, data=df.clinical.bcr.cluster)
+p.surv <- survminer::ggsurvplot(km.fit, pval = TRUE, risk.table = TRUE, ncensor.plot = FALSE,
+                                title = "The TCGA training dataset",
+                                palette = color.three.clusters,
+                                legend.title = "", legend.labs = c("TCE", "EPCE", "TASCE"),
+                                xlab = "Time in months", ylab = "BCR free probability")
+                                
+pdf("../output/surv_curv_3_groups.pdf")
+print(p.surv)
+dev.off()
+
 # save the data
 save(res.deconv.tcga, res.deconv.scale.tcga, res.deconv.sample.tcga, df.clinical.bcr.cluster, file = "../data/clustering_tcga_removing_badguys.RData")
 
