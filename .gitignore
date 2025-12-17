@@ -1,3 +1,6 @@
 .DS_Store
 .Rhistory
 .ipynb_checkpoints/
+
+# Do NOT upload OUH data to cloud
+data/OUH/
