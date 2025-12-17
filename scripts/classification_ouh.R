@@ -55,7 +55,7 @@ pred <- factor(pred, levels = new.levels)
 df.pred <- data.frame("pred" = pred)
 row.names(df.pred) <- colnames(res.deconv.ouh.scale)
 
-df.patient.pred <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, focus)), by = "row.names")
+df.patient.pred <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, localized.in.focus.number)), by = "row.names")
 df.patient.pred$patient_number <- as.factor(df.patient.pred$patient_number)
 
 # df.patient.pred <- df.patient.pred %>% dplyr::filter(focus != "F3")
@@ -67,7 +67,7 @@ df.rect <- data.frame(xmin = seq(1, 23) - 0.4,
 
 pdf("../output/pred3_of_sample_vs_patient.pdf", width = 8, height = 2.2)
 p <- ggplot() +
-  geom_dotplot(data = df.patient.pred, aes(x = patient_number, y = pred, fill = focus), 
+  geom_dotplot(data = df.patient.pred, aes(x = patient_number, y = pred, fill = localized.in.focus.number), 
                stackgroups=TRUE, binpositions="all", binaxis = "y", stackdir = "center", binwidth = 0.17) +
   geom_rect(data = df.rect, aes(xmin = xmin, xmax = xmax, 
                                 ymin = ymin, ymax = ymax), fill = "grey", alpha = 0.2) +
