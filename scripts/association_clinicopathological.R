@@ -99,9 +99,9 @@ gs.cat <- gs
 
 # `%ni%` <- Negate(`%in%`)
 
-gs.cat[gs.cat %in% c("0+3", "3+0", "3+3", "0+3+4", "3+4", "3+4+0", "3+4+5")] <- "low"
+gs.cat[gs.cat %in% c("0+3", "3+0", "3+3", "0+3+3", "0+3+4", "3+4", "3+3+0", "3+4+0", "3+4+5", "3+5+0")] <- "low"
 gs.cat[gs.cat %in% c("4+3")] <- "intermediate"
-gs.cat[gs.cat %in% c("0+4", "0+4+4", "4+4", "4+5")] <- "high"
+gs.cat[gs.cat %in% c("0+4", "0+4+4", "0+4+5", "4+4", "4+5")] <- "high"
 
 df.pred$GleasonScore <- factor(gs.cat, levels = c("low", "intermediate", "high"))
 
