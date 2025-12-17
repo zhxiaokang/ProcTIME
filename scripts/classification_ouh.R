@@ -72,7 +72,7 @@ p <- ggplot() +
   geom_rect(data = df.rect, aes(xmin = xmin, xmax = xmax, 
                                 ymin = ymin, ymax = ymax), fill = "grey", alpha = 0.2) +
   theme_classic() +
-  xlab("Patient ID") + ylab("Predicted cell type\ncomposition subtype") + labs(fill = "localized.in.focus.number")
+  xlab("Patient ID") + ylab("Predicted cell type\ncomposition subtype") + labs(fill = "Focus")
 print(p)
 dev.off()
 
