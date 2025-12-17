@@ -8,6 +8,7 @@ library(MASS)
 library(reshape)
 
 rm(list = ls())
+set.seed(12345)
 
 load("../data/ouh_time_deconv.RData")
 
@@ -112,5 +113,3 @@ save(model, res.deconv.ouh.scale, df.pred, file = "../data/prediction_3_ouh.RDat
 #                       cluster_columns = TRUE, cluster_rows = TRUE,
 #                       bottom_annotation = col.ha,
 #                       top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = color.three.clusters), labels = levels(cluster))), show_column_names = FALSE)
-
-
