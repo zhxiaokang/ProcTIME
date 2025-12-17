@@ -7,7 +7,7 @@ library(stringr)
 # ====== on TCGA dataset ======
 rm(list = ls())
 
-load('../data/clustering_tcga_original.RData')
+load('../data/clustering_tcga_removing_badguys.RData')
 
 gleason.score <- df.clinical.bcr.cluster$stage_event_gleason_grading
 index.intermediate.gs <- c(grep("^743", gleason.score))
