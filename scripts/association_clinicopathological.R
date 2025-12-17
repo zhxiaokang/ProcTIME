@@ -94,7 +94,7 @@ cluster <- df.pred$pred
 
 load("../data/ouh_time_deconv.RData")
 
-gs <- df.bcr.ouh$gleason_score_updated
+gs <- df.bcr.ouh$gleason.for.biopsy
 gs.cat <- gs
 
 # `%ni%` <- Negate(`%in%`)
