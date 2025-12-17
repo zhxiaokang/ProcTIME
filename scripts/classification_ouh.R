@@ -38,7 +38,7 @@ res.deconv.ouh.scale <- t(scale(t(res.deconv.ouh)))
 # print(p)
 # dev.off()
 # # 
-# # df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, sample_name, clinical_outcome, days_to_event)), 
+# # df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, sample_name, Event, DaysToEvent)), 
 # #                      by.x = "row.names", by.y = "sample_name")
 # # df.pred.bcr <- df.pred.bcr[order(df.pred.bcr$patient_number), ]
 # # 
@@ -99,7 +99,7 @@ dev.off()
 # print(p)
 # dev.off()
 
-df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, clinical_outcome, days_to_event)),
+df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, Event, DaysToEvent)),
                      by = "row.names")
 df.pred.bcr <- df.pred.bcr[order(df.pred.bcr$patient_number), ]
 
