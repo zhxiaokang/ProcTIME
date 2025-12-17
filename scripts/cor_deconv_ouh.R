@@ -70,12 +70,12 @@ for (i in patient.number) {
   # the df for one patient
   df.patient <- dplyr::filter(sample.info, patient_number == i)
   # exclude patients that only have samples from 1 focus
-  if (length(unique(df.patient$focus)) < 2) {
+  if (length(unique(df.patient$localized.in.focus.number)) < 2) {
     print("only one focus")
     next
   }
   # the focus that has more than 1 sample
-  focus.rep <- names(which(table(dplyr::select(df.patient, focus))>1))
+  focus.rep <- names(which(table(dplyr::select(df.patient, localized.in.focus.number))>1))
   if (length(focus.rep) == 0) {
     print("single sample for all foci")
     next
@@ -92,10 +92,10 @@ for (i in patient.keep) {
   df.patient <- dplyr::filter(sample.info, patient_number == i)
   
   # the focus that has more than 1 sample
-  focus.rep <- names(which(table(dplyr::select(df.patient, focus))>1))
+  focus.rep <- names(which(table(dplyr::select(df.patient, localized.in.focus.number))>1))
   
   # the sample id that belongs to that focus
-  sample.id <- rownames(dplyr::filter(df.patient, focus == focus.rep))
+  sample.id <- rownames(dplyr::filter(df.patient, localized.in.focus.number == focus.rep))
   sample.pair <- list(sample.id)
   list.pair.same.focus <- c(list.pair.same.focus, sample.pair)
 }
@@ -112,10 +112,10 @@ for (i in patient.keep) {
   df.patient <- dplyr::filter(sample.info, patient_number == i)
   
   # the focus that has more than 1 sample
-  focus.rep <- names(which(table(dplyr::select(df.patient, focus))>1))
+  focus.rep <- names(which(table(dplyr::select(df.patient, localized.in.focus.number))>1))
   
-  sample.id.rep.focus <- rownames(dplyr::filter(df.patient, focus == focus.rep))  # there can be either 2 or 3 samples
-  sample.id.another.focus <- rownames(dplyr::filter(df.patient, focus != focus.rep))  # there is always only 1 sample
+  sample.id.rep.focus <- rownames(dplyr::filter(df.patient, localized.in.focus.number == focus.rep))  # there can be either 2 or 3 samples
+  sample.id.another.focus <- rownames(dplyr::filter(df.patient, localized.in.focus.number != focus.rep))  # there is always only 1 sample
   
   for (sample.rep in sample.id.rep.focus){
     sample.pair <- list(c(sample.rep, sample.id.another.focus))
@@ -180,10 +180,10 @@ p <- ggboxplot(df.box.sim, x = "focus", y = "sim",
                color = "focus", palette = "jco",
                add = "jitter") + labs(x= "", y="Similarity")
 
-p.3comparisons.sim <- p + 
-                      stat_compare_means(comparisons = all_comparisons, method = 'wilcox.test',
-                                         aes(label = paste("P =", formatC(..p.format.., format = "f", digits = 2)))) +
-                      theme(legend.position = "none")
+# p.3comparisons.sim <- p + 
+#                       stat_compare_means(comparisons = all_comparisons, method = 'wilcox.test',
+#                                          aes(label = paste("P =", formatC(..p.format.., format = "f", digits = 2)))) +
+#                       theme(legend.position = "none")
 
 p.3comparisons.sim <- p + 
   stat_compare_means(comparisons = all_comparisons, method = 'wilcox.test',
@@ -195,23 +195,23 @@ print(p.3comparisons.sim)
 dev.off()
 
 # Load necessary libraries
-library(ggplot2)
-library(ggpubr)
+# library(ggplot2)
+# library(ggpubr)
 
-# Create a sample data frame
-data <- data.frame(
-  Group = rep(c("A", "B", "C"), each = 20),
-  Value = c(rnorm(20, mean = 0), rnorm(20, mean = 1), rnorm(20, mean = 2))
-)
+# # Create a sample data frame
+# data <- data.frame(
+#   Group = rep(c("A", "B", "C"), each = 20),
+#   Value = c(rnorm(20, mean = 0), rnorm(20, mean = 1), rnorm(20, mean = 2))
+# )
 
-# Create a boxplot with custom p-value label
-p <- ggboxplot(data, x = "Group", y = "Value")
+# # Create a boxplot with custom p-value label
+# p <- ggboxplot(data, x = "Group", y = "Value")
 
-# Customize p-value label
-p + stat_compare_means(comparisons = list(c("A", "B"), c("A", "C"), c("B", "C")), method = "t.test",
-                       aes(label = paste("P = ", formatC(..p.format.., format = "f", digits = 2))))
+# # Customize p-value label
+# p + stat_compare_means(comparisons = list(c("A", "B"), c("A", "C"), c("B", "C")), method = "t.test",
+#                        aes(label = paste("P = ", formatC(..p.format.., format = "f", digits = 2))))
 
-p
+# p
 # 
 # df.box.cor <- data.frame("cor" = c(cor.same.focus, cor.diff.foci), "focus" = c(rep("Same focus", length(cor.same.focus)), rep("Different foci", length(cor.diff.foci))))
 # 
