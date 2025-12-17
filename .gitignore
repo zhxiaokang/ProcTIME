@@ -4,3 +4,4 @@
 
 # Do NOT upload OUH data to cloud
 data/OUH/
+*_ouh*
