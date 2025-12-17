@@ -176,6 +176,10 @@ p <- ggboxplot(df.box.dist, x = "focus", y = "dist",
 
 p.3comparisons.dist <- p + stat_compare_means(comparisons = all_comparisons, label = "p.format")
 
+pdf("../output/corr_3comparisons_euclidean.pdf", width = 6, height = 4)
+print(p.3comparisons.dist)
+dev.off()
+
 p <- ggboxplot(df.box.sim, x = "focus", y = "sim",
                color = "focus", palette = "jco",
                add = "jitter") + labs(x= "", y="Similarity")
