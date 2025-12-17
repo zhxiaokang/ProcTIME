@@ -22,6 +22,11 @@ load("../data/ouh_time_deconv.RData")
 
 # ==== draw Heatmap ====
 
+out.dir <- "../output/heatmap/"
+if (!dir.exists(out.dir)) {
+  dir.create(out.dir, recursive = TRUE)
+}
+
 # # function scale to [0, 1]
 # scale_zero_one <- function(vec) {
 #   min.vec <- min(vec)
@@ -49,7 +54,7 @@ cell.types <- row.names(res.deconv.ouh.scale)
 cell.types[8] <- "Epithelial cell"
 row.names(res.deconv.ouh.scale) <- cell.types
 
-pdf("../output/heatmap/heatmap_ouh_3clusters.pdf", width = 8, height = 3)
+pdf(file.path(out.dir, "heatmap_ouh_3clusters.pdf"), width = 8, height = 3)
 p <- Heatmap(res.deconv.ouh.scale, column_title = "Cell type proportions across clusters on the Oslo dataset", name = "Scaled \nproportion",
              column_split = cluster, 
              row_order = c("T cell CD4+", "T cell CD8+", "Epithelial cell", "Cancer associated fibroblast", "Endothelial cell", "Macrophage", "B cell", "NK cell"),
