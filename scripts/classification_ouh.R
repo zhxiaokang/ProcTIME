@@ -6,11 +6,13 @@ library(survminer)
 library(ComplexHeatmap)
 library(MASS)
 library(reshape)
+library(sva)
 
 rm(list = ls())
 set.seed(12345)
 
 load("../data/ouh_time_deconv.RData")
+load("../data/clustering_tcga_removing_badguys.RData")
 
 # load color palette
 source("color_palette.R")
@@ -19,7 +21,26 @@ new.levels <- c("TCE", "EPCE", "TASCE")
 
 # scale the cell types' proportions
 ## z-score transformation --- 0 mean 1 deviation
-res.deconv.ouh.scale <- t(scale(t(res.deconv.ouh)))
+# res.deconv.ouh.scale <- t(scale(t(res.deconv.ouh)))
+
+# Use ComBat to remove batch effect
+# TCGA as reference batch
+combined.dat <- cbind(res.deconv.tcga, res.deconv.ouh)
+batch <- c(rep("TCGA", ncol(res.deconv.tcga)), rep("OUH", ncol(res.deconv.ouh)))
+
+# ComBat with reference batch
+adjusted.dat <- ComBat(dat = combined.dat, batch = batch, mod = NULL, par.prior = TRUE, ref.batch = "TCGA")
+
+# Extract OUH
+res.deconv.ouh.adj <- adjusted.dat[, (ncol(res.deconv.tcga) + 1):ncol(adjusted.dat)]
+
+# Apply TCGA scaling parameters
+load("../data/tcga_scaling_params.RData")
+# includes res.mean, res.sd which were calculated from TCGA data
+
+# Scale
+res.deconv.ouh.adj.t <- t(res.deconv.ouh.adj)
+res.deconv.ouh.scale <- t(scale(res.deconv.ouh.adj.t, center = res.mean, scale = res.sd))
 
 # # ======= make predictions on the lda model of 2 clusters =======
 # load("../data/model_2classes_tcga.RData")
