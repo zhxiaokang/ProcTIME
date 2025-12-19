@@ -18,7 +18,19 @@ load("../data/tcga_time_deconv_rm_outlier.RData")
 res.deconv <- res.deconv.epic
 
 # Scale: z-score transformation --- 0 mean 1 deviation
-res.deconv.scale <- t(scale(t(res.deconv)))
+# res.deconv.scale <- t(scale(t(res.deconv)))
+# res.deconv.scale <- res.deconv
+
+# Calculate mean and sd for each feature (row)
+res.deconv.t <- t(res.deconv)
+res.mean <- colMeans(res.deconv.t)
+res.sd <- apply(res.deconv.t, 2, sd)
+
+# Save parameters
+save(res.mean, res.sd, file = "../data/tcga_scaling_params.RData")
+
+# Apply scaling
+res.deconv.scale <- t(scale(res.deconv.t, center = res.mean, scale = res.sd))
 # 
 # res.mean.tcga <- apply(res.deconv, 1, mean)
 # res.sd.tcga <- apply(res.deconv, 1, sd)
