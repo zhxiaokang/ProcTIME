@@ -77,7 +77,11 @@ pred <- factor(pred, levels = new.levels)
 df.pred <- data.frame("pred" = pred)
 row.names(df.pred) <- colnames(res.deconv.ouh.scale)
 
-df.patient.pred <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, localized.in.focus.number)), by = "row.names")
+df.patient.pred <- merge(df.pred,
+                         dplyr::select(df.bcr.ouh,
+                                       c(patient_number, localized.in.focus.number,
+                                         gleason.for.biopsy)),
+                         by = "row.names")
 df.patient.pred$patient_number <- as.factor(df.patient.pred$patient_number)
 
 # df.patient.pred <- df.patient.pred %>% dplyr::filter(focus != "F3")
@@ -99,6 +103,13 @@ print(p)
 dev.off()
 
 # ====== use clustering result instead of predicted results ======
+df.pred.csv <- df.patient.pred %>%
+  dplyr::rename(sample_id = Row.names,
+                focus = localized.in.focus.number,
+                gleason_biopsy = gleason.for.biopsy) %>%
+  dplyr::arrange(as.numeric(as.character(patient_number)), focus, sample_id) %>%
+  dplyr::select(sample_id, patient_number, focus, gleason_biopsy, pred)
+write.csv(df.pred.csv, "../output/prediction_3_ouh.csv", row.names = FALSE)
 # load("../data/clustering_ouh.RData")
 # 
 # df.bcr.ouh.class$patient_number <- as.factor(df.bcr.ouh.class$patient_number)
