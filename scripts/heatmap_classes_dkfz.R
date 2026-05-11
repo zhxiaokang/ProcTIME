@@ -25,17 +25,6 @@ if (!dir.exists(out.dir)) {
   dir.create(out.dir, recursive = TRUE)
 }
 
-# # function scale to [0, 1]
-# scale_zero_one <- function(vec) {
-#   min.vec <- min(vec)
-#   max.vec <- max(vec)
-#   
-#   vec.scale <- (vec - min.vec) / (max.vec - min.vec)
-#   return(vec.scale)
-# }
-# 
-# res.deconv.tcga.zero.one <- t(apply(res.deconv.tcga, 1, scale_zero_one))
-
 cell.types <- row.names(res.deconv.dkfz.scale)
 cell.types[8] <- "Epithelial cell"
 row.names(res.deconv.dkfz.scale) <- cell.types
@@ -48,23 +37,3 @@ p <- Heatmap(res.deconv.dkfz.scale, column_title = "Cell type proportions across
         top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = color.three.clusters), labels = levels(cluster))), show_column_names = FALSE)
 print(p)
 dev.off()
-# 
-# # 2 clusters
-# load("../data/prediction_2_dkfz.RData")
-# cluster <- df.pred$pred
-# 
-# pdf("../output/heatmap/heatmap_dkfz_2clusters.pdf", width = 7, height = 3)
-# p <- Heatmap(res.deconv.dkfz.scale, column_title = "Cell type proportions across clusters on DKFZ", name = "Scaled \nproportion",
-#         column_split = cluster, 
-#         cluster_columns = FALSE, cluster_rows = TRUE,
-#         top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = color.two.clusters), labels = levels(cluster))), show_column_names = FALSE)
-# print(p)
-# dev.off()
-# 
-# pdf("../output/heatmap/heatmap_dkfz_2clusters_with_dendrogram.pdf", width = 7, height = 3)
-# p <- Heatmap(res.deconv.dkfz.scale, column_title = "Cell type proportions across clusters on DKFZ", name = "Scaled \nproportion",
-#         column_split = cluster, 
-#         cluster_columns = TRUE, cluster_rows = TRUE,
-#         top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = color.two.clusters), labels = levels(cluster))), show_column_names = FALSE)
-# print(p)
-# dev.off()

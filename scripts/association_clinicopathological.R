@@ -342,22 +342,3 @@ p.fisher <- ggbarstats(
 pdf("../output/association_subtypes_gleasonscore_dkfz.pdf", width = 6, height = 4)
 print(p.fisher)
 dev.off()
-
-
-
-
-
-
-
-# tce.low <- nrow(dplyr::filter(df.pred, pred == "TCE" & gleason_score == "low"))
-# tce.intermediate <- nrow(dplyr::filter(df.pred, pred == "TCE" & gleason_score == "intermediate"))
-# tce.high <- nrow(dplyr::filter(df.pred, pred == "TCE" & gleason_score == "high"))
-# 
-# tuce.low <- nrow(dplyr::filter(df.pred, pred == "TuCE" & gleason_score == "low"))
-# tuce.intermediate <- nrow(dplyr::filter(df.pred, pred == "TuCE" & gleason_score == "intermediate"))
-# tuce.high <- nrow(dplyr::filter(df.pred, pred == "TuCE" & gleason_score == "high"))
-# 
-# tasce.low <- nrow(dplyr::filter(df.pred, pred == "TASCE" & gleason_score == "low"))
-# tasce.intermediate <- nrow(dplyr::filter(df.pred, pred == "TASCE" & gleason_score == "intermediate"))
-# tasce.high <- nrow(dplyr::filter(df.pred, pred == "TASCE" & gleason_score == "high"))
-

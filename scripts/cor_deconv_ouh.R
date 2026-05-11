@@ -24,28 +24,6 @@ df.sample.deconv.scale <- data.frame(t(res.deconv.ouh.scale))
 
 # ====== function to calculate the corr of all input pairs ======
 # # calculate correlations of all sample pairs
-# cor_pairs <- function(df, list.pair) {
-#   # df: df of all samples and their cell fraction
-#   # list.pair: list of all pairs of samples (in each pair, number of samples is 2+)
-#   list.cor <- c()  # vector to collect all correlations
-#   for (pair in list.pair) {
-#     df.pair <- dplyr::select(df, dplyr::all_of(pair))
-#     m.cor <- cor(df.pair, method = "spearman")
-#     list.cor <- c(list.cor, m.cor[upper.tri(m.cor)])
-#   }
-#   return(list.cor)
-# }
-
-# dist_pairs <- function(df, list.pair) {
-#   list.dist <- c()
-  
-#   for (pair in list.pair){
-#     df.pair <- df[all_of(pair), ]
-#     m.dist <- dist(df.pair, method = "euclidean")
-#     list.dist <- c(list.dist, c(m.dist))
-#   }
-#   return(list.dist)
-# }
 
 sim_pairs <- function(df, list.pair) {
   # df: df of all samples and their cell fraction
@@ -100,8 +78,6 @@ for (i in patient.keep) {
   list.pair.same.focus <- c(list.pair.same.focus, sample.pair)
 }
 
-# cor.same.focus <- cor_pairs(res.deconv.ouh.scale, list.pair.same.focus)
-# dist.same.focus <- dist_pairs(df.sample.deconv.scale, list.pair.same.focus)
 sim.same.focus <- sim_pairs(res.deconv.ouh.scale, list.pair.same.focus)
 
 # ====== construct the pairs of samples from different foci but the same patient ======
@@ -123,8 +99,6 @@ for (i in patient.keep) {
   }
 }
 
-# cor.diff.foci <- cor_pairs(res.deconv.ouh.scale, list.pair.diff.foci)
-# dist.diff.foci <- dist_pairs(df.sample.deconv.scale, list.pair.diff.foci)
 sim.diff.foci <- sim_pairs(res.deconv.ouh.scale, list.pair.diff.foci)
 
 # ====== construct the pairs of samples from different patients ======
@@ -143,19 +117,7 @@ for (i in patient.keep) {
 
 list.pair.diff.patient <- list(vec.pair.diff.patient)
 
-# cor.diff.patient <- cor_pairs(res.deconv.ouh.scale, list.pair.diff.patient)
-# dist.diff.patient <- dist_pairs(df.sample.deconv.scale, list.pair.diff.patient)
 sim.diff.patient <- sim_pairs(res.deconv.ouh.scale, list.pair.diff.patient)
-
-# df.box.cor <- data.frame("cor" = c(cor.diff.patient, cor.diff.foci, cor.same.focus), 
-#                          "focus" = c(rep("Different patients", length(cor.diff.patient)), 
-#                                      rep("Different foci", length(cor.diff.foci)),
-#                                      rep("Same focus", length(cor.same.focus))))
-
-# df.box.dist <- data.frame("dist" = c(dist.diff.patient, dist.diff.foci, dist.same.focus), 
-#                           "focus" = c(rep("Different patients", length(dist.diff.patient)), 
-#                                       rep("Different foci", length(dist.diff.foci)),
-#                                       rep("Same focus", length(dist.same.focus))))
 
 df.box.sim <- data.frame("sim" = c(sim.diff.patient, sim.diff.foci, sim.same.focus), 
                          "focus" = c(rep("Different patients", length(sim.diff.patient)), 
@@ -164,30 +126,9 @@ df.box.sim <- data.frame("sim" = c(sim.diff.patient, sim.diff.foci, sim.same.foc
 
 all_comparisons <- list(c("Different patients", "Different foci"), c("Different foci", "Same focus"), c("Different patients", "Same focus"))
 
-# p <- ggboxplot(df.box.cor, x = "focus", y = "cor",
-#                color = "focus", palette = "jco",
-#                add = "jitter", short.panel.labs = TRUE)
-
-# p.3comparisons.cor <- p + stat_compare_means(comparisons = all_comparisons, label = "p.format")
-
-# p <- ggboxplot(df.box.dist, x = "focus", y = "dist",
-#                color = "focus", palette = "jco",
-#                add = "jitter", short.panel.labs = TRUE)
-
-# p.3comparisons.dist <- p + stat_compare_means(comparisons = all_comparisons, label = "p.format")
-
-# pdf("../output/corr_3comparisons_euclidean.pdf", width = 6, height = 4)
-# print(p.3comparisons.dist)
-# dev.off()
-
 p <- ggboxplot(df.box.sim, x = "focus", y = "sim",
                color = "focus", palette = "jco",
                add = "jitter") + labs(x= "", y="Similarity")
-
-# p.3comparisons.sim <- p + 
-#                       stat_compare_means(comparisons = all_comparisons, method = 'wilcox.test',
-#                                          aes(label = paste("P =", formatC(..p.format.., format = "f", digits = 2)))) +
-#                       theme(legend.position = "none")
 
 p.3comparisons.sim <- p + 
   stat_compare_means(comparisons = all_comparisons, method = 'wilcox.test',
@@ -207,36 +148,3 @@ p.3comparisons.sim.pval <- p +
 pdf("../output/corr_3comparisons_similarity_pval.pdf", width = 6, height = 4)
 print(p.3comparisons.sim.pval)
 dev.off()
-
-# Load necessary libraries
-# library(ggplot2)
-# library(ggpubr)
-
-# # Create a sample data frame
-# data <- data.frame(
-#   Group = rep(c("A", "B", "C"), each = 20),
-#   Value = c(rnorm(20, mean = 0), rnorm(20, mean = 1), rnorm(20, mean = 2))
-# )
-
-# # Create a boxplot with custom p-value label
-# p <- ggboxplot(data, x = "Group", y = "Value")
-
-# # Customize p-value label
-# p + stat_compare_means(comparisons = list(c("A", "B"), c("A", "C"), c("B", "C")), method = "t.test",
-#                        aes(label = paste("P = ", formatC(..p.format.., format = "f", digits = 2))))
-
-# p
-# 
-# df.box.cor <- data.frame("cor" = c(cor.same.focus, cor.diff.foci), "focus" = c(rep("Same focus", length(cor.same.focus)), rep("Different foci", length(cor.diff.foci))))
-# 
-# p <- ggboxplot(df.box.cor, x = "focus", y = "cor",
-#                color = "focus", palette = "jco",
-#                add = "jitter", short.panel.labs = TRUE,
-#                xlab = "Focus", ylab = "Spearman Correlation")
-# p.2comparisons <- p + stat_compare_means()
-# 
-# pdf("../output/corr_2comparisons.pdf", width = 6, height = 4)
-# print(p.2comparisons)
-# dev.off()
-
-

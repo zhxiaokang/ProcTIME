@@ -31,31 +31,7 @@ save(res.mean, res.sd, file = "../data/tcga_scaling_params.RData")
 
 # Apply scaling
 res.deconv.scale <- t(scale(res.deconv.t, center = res.mean, scale = res.sd))
-# 
-# res.mean.tcga <- apply(res.deconv, 1, mean)
-# res.sd.tcga <- apply(res.deconv, 1, sd)
-# 
-# my_scale <- function(vec.patient, vec.mean, vec.sd){
-#   vec.patient.scale <- (vec.patient - vec.mean) / vec.sd
-#   return(vec.patient.scale)
-# }
-# 
-# save(res.mean.tcga, res.sd.tcga, my_scale, file = "../data/scale_tcga.RData")
-# 
-# res.deconv.scale <- apply(res.deconv, 2, my_scale, vec.mean = res.mean.tcga, vec.sd = res.sd.tcga)
 
-# # ==== scale with Generalized Linear scaling ====
-# source('glscale.R')
-# 
-# out.glscale <- glscale(t(res.deconv))
-# 
-# res.deconv.scale <- t(out.glscale[[1]])
-# setting.glscale.tcga <- out.glscale[[2]]
-# 
-# save(setting.glscale.tcga, file = "../data/scale_setting_tcga.RData")
-# 
-# rownames(res.deconv.scale) <- rownames(res.deconv)
-# colnames(res.deconv.scale) <- colnames(res.deconv)
 
 # Clustering
 results.tcga <- ConsensusClusterPlus(res.deconv.scale, maxK=6, reps=1000, pItem=0.8, pFeature=1, title="../output/Consensus_clustering_epic_pam_pearson_average_tcga", 
@@ -99,8 +75,6 @@ df.clinical.bcr.cluster <- column_to_rownames(df.clinical.bcr.cluster, colnames(
 df.clinical.bcr.cluster$bcr_months <- as.numeric(df.clinical.bcr.cluster$bcr_months)
 df.clinical.bcr.cluster$biochemical_recurrence <- 1*(df.clinical.bcr.cluster$biochemical_recurrence=="YES")
 
-# draw the Surv curve of TCGA's 3 clusters
-# options(repr.plot.width=6, repr.plot.height=5.5)
 
 # load color palette
 source("color_palette.R")
@@ -169,24 +143,4 @@ dev.off()
 
 # save the data
 save(res.deconv.tcga, res.deconv.scale.tcga, res.deconv.sample.tcga, df.clinical.bcr.cluster, file = "../data/clustering_tcga_removing_badguys.RData")
-
-# # ====== Merge cluster mediate and bad ======
-# cluster <- df.clinical.bcr.cluster$cluster
-# cluster[which(cluster == "mediate" | cluster == "bad")] <- "bad"
-# 
-# cluster <- factor(cluster, levels = c("good", "bad"))
-# 
-# df.clinical.bcr.cluster$cluster <- cluster
-# 
-# # options(repr.plot.width=6, repr.plot.height=5.5)
-# 
-# km.fit <- survminer::surv_fit(Surv(bcr_months, biochemical_recurrence) ~ cluster, data=df.clinical.bcr.cluster)
-# p.surv <- survminer::ggsurvplot(km.fit, pval = TRUE, risk.table = TRUE, ncensor.plot = FALSE,
-#                                 title = "KM plot of 2 clusters of TCGA",
-#                                 palette = c("#E64B35", "#B3B3B3"),
-#                                 xlab = "Time in months", ylab = "BCR free probability")
-# 
-# pdf(file.path("../output/Consensus_clustering_epic_pam_pearson_average_tcga", "surv_curv_2_groups.pdf"))
-# print(p.surv)
-# dev.off()
 

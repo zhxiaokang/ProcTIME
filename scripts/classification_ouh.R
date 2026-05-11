@@ -11,17 +11,15 @@ library(sva)
 rm(list = ls())
 set.seed(12345)
 
+# Load the OUH deconvolution matrix and clinical mapping used as the prediction target cohort.
 load("../data/ouh_time_deconv.RData")
+# Load the TCGA deconvolution reference because its subtype labels and feature layout define the training space.
 load("../data/clustering_tcga_removing_badguys.RData")
 
 # load color palette
 source("color_palette.R")
 
 new.levels <- c("TCE", "EPCE", "TASCE")
-
-# scale the cell types' proportions
-## z-score transformation --- 0 mean 1 deviation
-# res.deconv.ouh.scale <- t(scale(t(res.deconv.ouh)))
 
 # Use ComBat to remove batch effect
 # TCGA as reference batch
@@ -34,37 +32,13 @@ adjusted.dat <- ComBat(dat = combined.dat, batch = batch, mod = NULL, par.prior 
 # Extract OUH
 res.deconv.ouh.adj <- adjusted.dat[, (ncol(res.deconv.tcga) + 1):ncol(adjusted.dat)]
 
-# Apply TCGA scaling parameters
+# Apply the mean and standard deviation learned from TCGA so OUH samples are transformed with the same scaling as the training data.
 load("../data/tcga_scaling_params.RData")
 # includes res.mean, res.sd which were calculated from TCGA data
 
 # Scale
 res.deconv.ouh.adj.t <- t(res.deconv.ouh.adj)
 res.deconv.ouh.scale <- t(scale(res.deconv.ouh.adj.t, center = res.mean, scale = res.sd))
-
-# # ======= make predictions on the lda model of 2 clusters =======
-# load("../data/model_2classes_tcga.RData")
-# 
-# model <- model.lda
-# 
-# pred <- predict(model, t(res.deconv.ouh.scale))$class
-# pred <- factor(pred, levels = c("good", "bad"))
-# 
-# df.pred <- data.frame("pred" = pred)
-# row.names(df.pred) <- colnames(res.deconv.ouh.scale)
-# 
-# df.patient.pred <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, sample_name)), by.x = "row.names", by.y = "sample_name")
-# 
-# pdf("../output/pred2_of_sample_vs_patient.pdf", width = 16, height = 4.3)
-# p <- ggplot(df.patient.pred, aes(x = as.factor(patient_number), y = pred)) + geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.08)
-# print(p)
-# dev.off()
-# # 
-# # df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, sample_name, Event, DaysToEvent)), 
-# #                      by.x = "row.names", by.y = "sample_name")
-# # df.pred.bcr <- df.pred.bcr[order(df.pred.bcr$patient_number), ]
-# # 
-# # save(model, res.deconv.ouh.scale, df.pred, file = "../data/prediction_2_ouh.RData")
 
 # ======= make predictions on the lda model of 3 clusters =======
 load("../data/model_3classes_tcga.RData")
@@ -84,8 +58,6 @@ df.patient.pred <- merge(df.pred,
                          by = "row.names")
 df.patient.pred$patient_number <- as.factor(df.patient.pred$patient_number)
 
-# df.patient.pred <- df.patient.pred %>% dplyr::filter(focus != "F3")
-
 df.rect <- data.frame(xmin = seq(1, 23) - 0.4,
                       xmax = seq(1, 23) + 0.4,
                       ymin = rep(0, 23), 
@@ -102,7 +74,10 @@ p <- ggplot() +
 print(p)
 dev.off()
 
-# ====== use clustering result instead of predicted results ======
+df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, Event, DaysToEvent)),
+                     by = "row.names")
+df.pred.bcr <- df.pred.bcr[order(df.pred.bcr$patient_number), ]
+
 df.pred.csv <- df.patient.pred %>%
   dplyr::rename(sample_id = Row.names,
                 focus = localized.in.focus.number,
@@ -110,38 +85,5 @@ df.pred.csv <- df.patient.pred %>%
   dplyr::arrange(as.numeric(as.character(patient_number)), focus, sample_id) %>%
   dplyr::select(sample_id, patient_number, focus, gleason_biopsy, pred)
 write.csv(df.pred.csv, "../output/prediction_3_ouh.csv", row.names = FALSE)
-# load("../data/clustering_ouh.RData")
-# 
-# df.bcr.ouh.class$patient_number <- as.factor(df.bcr.ouh.class$patient_number)
-# 
-# # df.bcr.ouh.class <- df.bcr.ouh.class %>% dplyr::filter(focus != "F3")
-# 
-# df.rect <- data.frame(xmin = seq(1, 23) - 0.4,
-#                       xmax = seq(1, 23) + 0.4,
-#                       ymin = rep(0, 23), 
-#                       ymax = rep(3, 23) + 0.6)
-# 
-# pdf("../output/clustering_of_sample_vs_patient.pdf", width = 8, height = 2.2)
-# p <- ggplot() +
-#   geom_dotplot(data = df.bcr.ouh.class, aes(x = patient_number, y = class, fill = focus), 
-#                stackgroups=TRUE, binpositions="all", binaxis = "y", stackdir = "center", binwidth = 0.17) +
-#   geom_rect(data = df.rect, aes(xmin = xmin, xmax = xmax, 
-#                                 ymin = ymin, ymax = ymax), fill = "grey", alpha = 0.2) +
-#   theme_classic() +
-#   xlab("Patient ID") + ylab("Predicted TIME subtype") + labs(fill = "Focus")
-# print(p)
-# dev.off()
-
-df.pred.bcr <- merge(df.pred, dplyr::select(df.bcr.ouh, c(patient_number, Event, DaysToEvent)),
-                     by = "row.names")
-df.pred.bcr <- df.pred.bcr[order(df.pred.bcr$patient_number), ]
 
 save(model, res.deconv.ouh.scale, df.pred, file = "../data/prediction_3_ouh.RData")
-# 
-# cluster <- df.pred$pred
-# col.ha <- HeatmapAnnotation(patient = as.character(df.bcr.ouh$patient_number))
-# Heatmap(res.deconv.ouh.scale, column_title = "Cell type proportions across clusters on OUH", name = "Scaled \nproportion",
-#                       column_split = cluster, 
-#                       cluster_columns = TRUE, cluster_rows = TRUE,
-#                       bottom_annotation = col.ha,
-#                       top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = color.three.clusters), labels = levels(cluster))), show_column_names = FALSE)

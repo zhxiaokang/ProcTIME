@@ -15,14 +15,3 @@ model.lda <- lda(x, grouping = class.label)
 
 save(model.lda, file = "../data/model_3classes_tcga.RData")
 
-# # ====== merge "mediate" and "bad" into "bad" ======
-# cluster <- res.deconv.sample.tcga$cluster
-# cluster[which(cluster == "mediate" | cluster == "bad")] <- "bad"
-# res.deconv.sample.tcga$cluster <- cluster
-# 
-# class.label <- res.deconv.sample.tcga$cluster
-# x <- as.matrix(dplyr::select(res.deconv.sample.tcga, -c(cluster)))
-# model.lda <- lda(x, grouping = class.label)
-# 
-# save(model.lda, file = "../data/model_2classes_tcga.RData")
-
